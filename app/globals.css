@@ -1,0 +1,421 @@
+@import "tailwindcss";
+
+:root {
+  --paper: #efe4cc;
+  --paper-deep: #e4d4b4;
+  --ink: #1c1510;
+  --ink-soft: #4a3c32;
+  --rule: #c4b08a;
+  --brass: #8a5a22;
+  --forest: #2f5a3c;
+  --celadon: #c5d6b8;
+  --ochre: #c9a227;
+  --ochre-wash: #f0d789;
+  --cinnabar: #b42318;
+  --cinnabar-wash: #e8b4a4;
+  --move: 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@theme inline {
+  --color-background: var(--paper);
+  --color-foreground: var(--ink);
+  --font-sans: var(--font-body);
+  --font-mono: var(--font-mono);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background:
+    radial-gradient(1200px 700px at 12% -10%, #f7edd6 0%, transparent 55%),
+    radial-gradient(900px 600px at 110% 20%, #d9c7a3 0%, transparent 50%),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 47px,
+      rgba(138, 90, 34, 0.04) 48px
+    ),
+    var(--paper);
+  font-family: var(--font-body), "Palatino Linotype", Palatino, serif;
+}
+
+body::before {
+  content: "";
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  opacity: 0.14;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  z-index: 40;
+}
+
+.press {
+  position: relative;
+  z-index: 1;
+  width: min(1120px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 2.2rem 0 4rem;
+}
+
+.masthead {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.4rem;
+  border-bottom: 3px double var(--ink);
+  padding-bottom: 1.1rem;
+  margin-bottom: 1.25rem;
+}
+
+.kicker {
+  margin: 0;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+
+.masthead h1 {
+  margin: 0;
+  font-family: var(--font-display), "Fraunces", serif;
+  font-size: clamp(3.4rem, 8vw, 6.4rem);
+  font-weight: 650;
+  font-variation-settings: "SOFT" 40, "WONK" 1, "opsz" 72;
+  letter-spacing: -0.04em;
+  line-height: 0.86;
+}
+
+.lede {
+  margin: 0.4rem 0 0;
+  max-width: 38rem;
+  font-size: 1.12rem;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+
+.hud {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 1.4rem 1.8rem;
+  margin-bottom: 1rem;
+}
+
+.stat span,
+.legend {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.stat strong {
+  display: block;
+  font-family: var(--font-display), serif;
+  font-size: 2rem;
+  line-height: 1;
+  font-weight: 600;
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-left: auto;
+}
+
+.swatch {
+  width: 0.7rem;
+  height: 0.7rem;
+  border: 1px solid var(--ink);
+  display: inline-block;
+}
+
+.swatch.ok {
+  background: var(--celadon);
+}
+
+.swatch.warn {
+  background: var(--ochre-wash);
+}
+
+.swatch.bad {
+  background: var(--cinnabar-wash);
+}
+
+.stage {
+  background:
+    linear-gradient(180deg, rgba(255, 252, 244, 0.55), rgba(232, 214, 180, 0.35));
+  border: 1px solid var(--ink);
+  box-shadow:
+    0 0 0 6px var(--paper-deep),
+    0 18px 40px rgba(28, 21, 16, 0.12);
+  min-height: 340px;
+  overflow: auto;
+  padding: 0.4rem;
+}
+
+.tree-svg {
+  display: block;
+  width: 100%;
+  min-height: 320px;
+  overflow: visible;
+}
+
+.tree-edge {
+  transform-box: fill-box;
+  transform-origin: 0 0;
+  transition: transform var(--move);
+}
+
+.tree-edge line {
+  stroke: var(--ink);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+.tree-node {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform var(--move);
+}
+
+.node-disk {
+  cursor: pointer;
+  stroke: var(--ink);
+  stroke-width: 1.8;
+  fill: var(--celadon);
+  transition:
+    fill 180ms ease,
+    stroke-width 180ms ease;
+}
+
+.tone-warn .node-disk {
+  fill: var(--ochre-wash);
+}
+
+.tone-bad .node-disk {
+  fill: var(--cinnabar-wash);
+  stroke: var(--cinnabar);
+  stroke-width: 2.4;
+}
+
+.tree-node.is-selected .node-disk {
+  stroke-width: 3;
+}
+
+.tree-node.is-hinted .node-disk {
+  stroke: var(--brass);
+  stroke-width: 3;
+  stroke-dasharray: 4 3;
+  animation: hint-pulse 1.1s ease-in-out infinite;
+}
+
+.node-value {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 13px;
+  font-weight: 600;
+  fill: var(--ink);
+  pointer-events: none;
+}
+
+.node-bf {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  fill: var(--ink-soft);
+  pointer-events: none;
+}
+
+.hint-label {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  fill: var(--brass);
+  pointer-events: none;
+}
+
+.move-btn {
+  cursor: pointer;
+}
+
+.move-btn .hit {
+  fill: transparent;
+}
+
+.move-btn .face {
+  fill: var(--ink);
+  stroke: var(--ink);
+}
+
+.move-btn text {
+  fill: var(--paper);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.controls {
+  margin-top: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  align-items: end;
+}
+
+.row label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.row label.grow {
+  flex: 1;
+  min-width: 180px;
+}
+
+select,
+button,
+input[type="range"] {
+  font: inherit;
+  color: var(--ink);
+}
+
+select,
+button {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 0.9rem;
+  border: 1px solid var(--ink);
+  background: #f7edd8;
+  box-shadow: 2px 2px 0 var(--ink);
+  cursor: pointer;
+}
+
+button:hover:not(:disabled),
+select:hover {
+  background: #fff8ea;
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 var(--ink);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+button.accent {
+  background: var(--forest);
+  color: #f4ecdc;
+}
+
+.footnote {
+  margin: 0;
+  max-width: 40rem;
+  font-size: 0.92rem;
+  font-style: italic;
+  color: var(--ink-soft);
+}
+
+.veil {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background: rgba(28, 21, 16, 0.38);
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.stamp {
+  width: min(420px, 100%);
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  padding: 1.6rem 1.5rem 1.4rem;
+  box-shadow: 10px 12px 0 var(--ink);
+  text-align: left;
+}
+
+.stamp-kicker {
+  margin: 0;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  color: var(--cinnabar);
+}
+
+.stamp h2 {
+  margin: 0.2rem 0 0.5rem;
+  font-family: var(--font-display), serif;
+  font-size: 2.2rem;
+  line-height: 1;
+}
+
+.stamp p {
+  margin: 0 0 1rem;
+  color: var(--ink-soft);
+}
+
+.stamp dl {
+  display: flex;
+  gap: 1.6rem;
+  margin: 0 0 1.2rem;
+}
+
+.stamp dt {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.stamp dd {
+  margin: 0;
+  font-family: var(--font-display), serif;
+  font-size: 1.8rem;
+}
+
+@keyframes hint-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@media (max-width: 720px) {
+  .legend {
+    margin-left: 0;
+  }
+
+  .masthead h1 {
+    font-size: 3.2rem;
+  }
+}
