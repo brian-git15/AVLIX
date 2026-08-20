@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run"
+    "test": "vitest run",
+    "par:bfs": "npx --yes tsx scripts/computeParBfs.ts",
+    "campaign:generate": "npx --yes tsx scripts/generateCampaignLevels.ts"
   },
   "dependencies": {
     "next": "16.3.1",

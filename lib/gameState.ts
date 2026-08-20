@@ -6,14 +6,16 @@ import {
   treeSize,
   type TreeNode,
 } from "./tree";
+import { bfsSolveExact } from "./parBfs";
 import {
   applyMove,
   inverseMove,
   subtreeRootAfterMove,
   type Move,
 } from "./rotations";
-import { dswBalance } from "./solver";
+import { proceduralParSolve } from "./solver";
 import { generateScramble, type ScrambleMode } from "./scramble";
+import { proceduralLevel, type Level } from "./scoring";
 
 export interface HistoryEntry {
   move: Move;
@@ -28,9 +30,10 @@ export interface GameState {
   moveCount: number;
   /** Remaining DSW moves from the last planned solution; cleared if the player diverges. */
   plan: Move[];
+  level: Level;
 }
 
-export function createGame(root: TreeNode): GameState {
+export function createGame(root: TreeNode, level?: Level): GameState {
   const copy = cloneTree(root);
   if (!copy) throw new Error("empty tree");
   return {
@@ -40,11 +43,18 @@ export function createGame(root: TreeNode): GameState {
     history: [],
     moveCount: 0,
     plan: [],
+    level: level ?? proceduralLevel(root),
   };
 }
 
 export function newGame(n: number, mode: ScrambleMode, k?: number): GameState {
   return createGame(generateScramble({ n, mode, k }));
+}
+
+export function createGameFromLevel(level: Level): GameState {
+  const root = cloneTree(level.scrambledTree);
+  if (!root) throw new Error("empty level tree");
+  return createGame(root, level);
 }
 
 export function playMove(state: GameState, move: Move): GameState {
@@ -100,11 +110,18 @@ export function isSolved(state: GameState): boolean {
   return isBalanced(state.root);
 }
 
-/** DSW move list for the current shape (clone — does not mutate the live tree). */
+/** Exact BFS for curated/exact levels; min(DSW, greedy) for procedural. */
 export function solutionMoves(state: GameState): Move[] {
-  const copy = cloneTree(state.root);
-  if (!copy) return [];
-  return dswBalance(copy).moves;
+  if (state.level.parExact) {
+    if (state.history.length === 0 && state.level.optimalPath) {
+      return state.level.optimalPath;
+    }
+    return bfsSolveExact(state.root).path;
+  }
+  if (state.history.length === 0 && state.level.optimalPath) {
+    return state.level.optimalPath;
+  }
+  return proceduralParSolve(state.root).moves;
 }
 
 export function withPlan(state: GameState): GameState {

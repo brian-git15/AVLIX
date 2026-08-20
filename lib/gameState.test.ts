@@ -7,6 +7,7 @@ import {
   nextHint,
   playMove,
   resetGame,
+  solutionMoves,
   undoMove,
   withPlan,
 } from "./gameState";
@@ -45,7 +46,7 @@ describe("gameState", () => {
     expect(inOrderTraversal(game.root)).toEqual(expectedInOrder(4));
   });
 
-  it("hint from DSW can be applied until solved", () => {
+  it("hint plan can be applied until solved", () => {
     let game = createGame(spine(7));
     expect(isSolved(game)).toBe(false);
     let guard = 0;
@@ -58,6 +59,24 @@ describe("gameState", () => {
     }
     expect(isBalanced(game.root)).toBe(true);
     expect(inOrderTraversal(game.root)).toEqual(expectedInOrder(7));
+  });
+
+  it("uses cached exact optimal path for untouched small levels", () => {
+    const game = createGame(spine(7));
+    const moves = solutionMoves(game);
+    expect(game.level.parExact).toBe(true);
+    expect(game.level.optimalPath).toBeDefined();
+    expect(moves).toEqual(game.level.optimalPath);
+    expect(moves).toHaveLength(game.level.parRotations);
+  });
+
+  it("recomputes exact path after the player deviates on small levels", () => {
+    const start = createGame(spine(7));
+    const deviated = playMove(start, { type: "L", nodeId: "n-1" });
+    const moves = solutionMoves(deviated);
+    expect(deviated.history).toHaveLength(1);
+    expect(moves).not.toEqual(start.level.optimalPath);
+    expect(moves.length).toBeLessThanOrEqual(deviated.level.parRotations);
   });
 
   it("applyMove via engine matches rotations.applyMove", () => {
