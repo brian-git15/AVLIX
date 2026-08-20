@@ -449,6 +449,61 @@ button.accent {
   }
 }
 
+.masthead-home {
+  grid-template-columns: 1fr auto;
+  align-items: start;
+  column-gap: 1.25rem;
+}
+
+.masthead-copy {
+  min-width: 0;
+}
+
+.maker-plate {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  justify-self: end;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid var(--rule);
+  background: rgba(247, 237, 216, 0.7);
+}
+
+.maker-portrait {
+  width: 52px;
+  height: 52px;
+  object-fit: cover;
+  object-position: center 18%;
+  border: 1px solid var(--ink);
+  background: var(--paper-deep);
+}
+
+.maker-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.maker-copy strong {
+  font-family: var(--font-display), serif;
+  font-size: 1.05rem;
+  line-height: 1.1;
+}
+
+.maker-copy p {
+  margin: 0;
+}
+
+.maker-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
 @media (max-width: 720px) {
   .legend {
     margin-left: 0;
@@ -457,6 +512,26 @@ button.accent {
   .masthead h1 {
     font-size: 3.2rem;
   }
+
+  .masthead-home {
+    grid-template-columns: 1fr;
+  }
+
+  .maker-plate {
+    justify-self: start;
+    margin-top: 0.35rem;
+  }
+}
+
+.maker-links a {
+  color: var(--brass);
+  text-decoration: none;
+  border-bottom: 1px solid var(--brass);
+}
+
+.maker-links a:hover {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
 }
 
 .mode-grid {
