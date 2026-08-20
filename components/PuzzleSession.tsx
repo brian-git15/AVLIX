@@ -63,6 +63,7 @@ export function PuzzleSession(props: PuzzleSessionProps) {
   const [elapsed, setElapsed] = useState(0);
   const [autoPlaying, setAutoPlaying] = useState(false);
   const [win, setWin] = useState<{ moves: number; time: number } | null>(null);
+  const [showWin, setShowWin] = useState(true);
   const [demo, setDemo] = useState(false);
   const [reportedWin, setReportedWin] = useState(false);
   const [guideOn, setGuideOn] = useState(false);
@@ -96,6 +97,7 @@ export function PuzzleSession(props: PuzzleSessionProps) {
       time: elapsed || Date.now() - (startedAt ?? Date.now()),
     };
     setWin(result);
+    setShowWin(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [solved, autoPlaying, game]);
 
@@ -127,6 +129,7 @@ export function PuzzleSession(props: PuzzleSessionProps) {
     setStartedAt(null);
     setElapsed(0);
     setWin(null);
+    setShowWin(true);
   }
 
   function rotate(move: Move) {
@@ -163,6 +166,7 @@ export function PuzzleSession(props: PuzzleSessionProps) {
       setGame(state);
       setTick((t) => t + 1);
       setWin({ moves: state.moveCount, time: elapsed });
+      setShowWin(true);
       return;
     }
     const next = playMove(state, moves[index]!);
@@ -172,6 +176,15 @@ export function PuzzleSession(props: PuzzleSessionProps) {
       playQueue(next, moves, index + 1);
     }, 420);
   }
+
+  useEffect(() => {
+    if (!win || !showWin) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setShowWin(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [win, showWin]);
 
   const earnedStars = win
     ? computeStars(win.moves, game.level, game.level)
@@ -320,6 +333,7 @@ export function PuzzleSession(props: PuzzleSessionProps) {
               setStartedAt(null);
               setElapsed(0);
               setWin(null);
+              setShowWin(true);
               setDemo(false);
               setReportedWin(false);
             }}
@@ -343,6 +357,11 @@ export function PuzzleSession(props: PuzzleSessionProps) {
           >
             Auto-solve
           </button>
+          {win && !showWin && (
+            <button type="button" onClick={() => setShowWin(true)}>
+              Results
+            </button>
+          )}
         </div>
         <p className="footnote">
           {guideOn
@@ -351,9 +370,18 @@ export function PuzzleSession(props: PuzzleSessionProps) {
         </p>
       </section>
 
-      {win && (
-        <div className="veil" role="dialog" aria-modal="true" aria-labelledby="win-title">
-          <div className="stamp">
+      {win && showWin && (
+        <div
+          className="veil"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="win-title"
+          onClick={() => setShowWin(false)}
+        >
+          <div
+            className="stamp"
+            onClick={(e) => e.stopPropagation()}
+          >
             <p className="stamp-kicker">{demo ? "Demonstration" : "Balanced"}</p>
             <h2 id="win-title">
               {demo ? "Solution replay" : "The press is even"}
@@ -382,13 +410,16 @@ export function PuzzleSession(props: PuzzleSessionProps) {
               </div>
             </dl>
             <div className="row buttons stamp-actions">
+              <button type="button" className="accent" onClick={() => setShowWin(false)}>
+                View tree
+              </button>
               {props.variant === "campaign" && props.hasNextLevel && (
-                <button type="button" className="accent" onClick={props.onNextLevel}>
+                <button type="button" onClick={props.onNextLevel}>
                   Next level
                 </button>
               )}
               {props.variant === "free" ? (
-                <button type="button" className="accent" onClick={() => scrambleNew()}>
+                <button type="button" onClick={() => scrambleNew()}>
                   New scramble
                 </button>
               ) : (
