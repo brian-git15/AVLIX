@@ -21,9 +21,26 @@ const mono = Azeret_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+      : "http://localhost:3000",
+  ),
   title: "AVLIX — AVL rotation puzzle",
   description:
     "A Rubik’s cube for binary trees. Rotate a scrambled BST until every node satisfies the AVL balance invariant.",
+  openGraph: {
+    title: "AVLIX — AVL rotation puzzle",
+    description:
+      "A Rubik’s cube for binary trees. Rotate until every node is AVL-balanced.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "AVLIX — AVL rotation puzzle",
+    description:
+      "A Rubik’s cube for binary trees. Rotate until every node is AVL-balanced.",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

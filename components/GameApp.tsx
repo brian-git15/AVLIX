@@ -161,7 +161,6 @@ export function GameApp() {
     }
     const index = getCampaignLevelIndex(campaignLevelId);
     const nextLevel = CAMPAIGN_LEVELS[index + 1];
-    const isTutorialLevel = level.difficulty === "tutorial";
 
     return (
       <PuzzleSession
@@ -170,7 +169,6 @@ export function GameApp() {
         initialGame={createGameFromLevel(level)}
         levelTitle={level.title ?? `Level ${index + 1}`}
         levelNumber={index + 1}
-        guideDefault={isTutorialLevel}
         onExit={() => setScreen("map")}
         hasNextLevel={index >= 0 && index < CAMPAIGN_LEVELS.length - 1}
         onNextLevel={() => {

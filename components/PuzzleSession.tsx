@@ -47,8 +47,6 @@ type CampaignProps = {
   onComplete: (stars: 0 | 1 | 2 | 3, moves: number, time: number) => void;
   onNextLevel?: () => void;
   hasNextLevel: boolean;
-  /** Show coach + C/Z/G labels by default on tutorial levels. */
-  guideDefault?: boolean;
 };
 
 export type PuzzleSessionProps = FreePlayProps | CampaignProps;
@@ -67,9 +65,7 @@ export function PuzzleSession(props: PuzzleSessionProps) {
   const [win, setWin] = useState<{ moves: number; time: number } | null>(null);
   const [demo, setDemo] = useState(false);
   const [reportedWin, setReportedWin] = useState(false);
-  const [guideOn, setGuideOn] = useState(
-    props.variant === "campaign" ? (props.guideDefault ?? false) : true,
-  );
+  const [guideOn, setGuideOn] = useState(false);
   const autoRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -194,15 +190,6 @@ export function PuzzleSession(props: PuzzleSessionProps) {
             : "Workshop — free scramble"}
         </p>
         <h1>AVLIX</h1>
-        {props.variant === "campaign" &&
-          props.guideDefault &&
-          game.moveCount === 0 &&
-          !win && (
-            <p className="tutorial-nudge">
-              Coach mode is on — look for Z · C · G labels and rotation hints
-              below the tree.
-            </p>
-          )}
       </header>
 
       <section className="hud">
