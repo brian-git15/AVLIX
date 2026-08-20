@@ -1,14 +1,16 @@
 "use client";
 
 import { balanceFactors, collectNodes, type TreeNode } from "@/lib/tree";
+import { moveRotationHint, type NodeRole } from "@/lib/avlGuide";
 import { legalRotations } from "@/lib/scramble";
 import { collectEdges, layoutTree } from "@/lib/layout";
-import type { Move, RotationType } from "@/lib/rotations";
+import { rotationShort, type Move, type RotationType } from "@/lib/rotations";
 
 type Props = {
   tree: TreeNode;
   selectedId: string | null;
   hintedMove: Move | null;
+  roleLabels?: Map<string, NodeRole>;
   disabled?: boolean;
   onSelect: (id: string | null) => void;
   onRotate: (move: Move) => void;
@@ -24,6 +26,7 @@ export function TreeView({
   tree,
   selectedId,
   hintedMove,
+  roleLabels,
   disabled,
   onSelect,
   onRotate,
@@ -70,10 +73,11 @@ export function TreeView({
         const selected = selectedId === node.id;
         const hinted = hintedMove?.nodeId === node.id;
         const moves = legalRotations(node);
+        const role = roleLabels?.get(node.id);
         return (
           <g
             key={node.id}
-            className={`tree-node tone-${toneForAbsBf(abs)}${selected ? " is-selected" : ""}${hinted ? " is-hinted" : ""}`}
+            className={`tree-node tone-${toneForAbsBf(abs)}${selected ? " is-selected" : ""}${hinted ? " is-hinted" : ""}${role ? ` role-${role.toLowerCase()}` : ""}`}
             style={{ transform: `translate(${pos.x}px, ${pos.y}px)` }}
           >
             <circle
@@ -81,7 +85,7 @@ export function TreeView({
               className="node-disk"
               role="button"
               tabIndex={disabled ? -1 : 0}
-              aria-label={`Node ${node.value}, balance ${bf}${hinted ? `, hinted ${hintedMove?.type}` : ""}`}
+              aria-label={`Node ${node.value}, balance ${bf}${role ? `, role ${role}` : ""}${hinted ? `, hinted ${hintedMove?.type}` : ""}`}
               onClick={() => {
                 if (disabled) return;
                 onSelect(selected ? null : node.id);
@@ -100,6 +104,11 @@ export function TreeView({
             <text className="node-bf" textAnchor="middle" y={-34}>
               {bf > 0 ? `+${bf}` : bf}
             </text>
+            {role && (
+              <text className={`node-role role-${role.toLowerCase()}`} textAnchor="middle" y={-52}>
+                {role}
+              </text>
+            )}
             {selected && !disabled && (
               <g className="node-moves">
                 {moves.includes("R") && (
@@ -107,6 +116,7 @@ export function TreeView({
                     type="R"
                     x={-52}
                     y={0}
+                    title={moveRotationHint("R")}
                     onClick={() => onRotate({ type: "R", nodeId: node.id })}
                   />
                 )}
@@ -115,6 +125,7 @@ export function TreeView({
                     type="L"
                     x={52}
                     y={0}
+                    title={moveRotationHint("L")}
                     onClick={() => onRotate({ type: "L", nodeId: node.id })}
                   />
                 )}
@@ -122,7 +133,7 @@ export function TreeView({
             )}
             {hinted && hintedMove && (
               <text className="hint-label" textAnchor="middle" y={44}>
-                next {hintedMove.type}
+                {rotationShort(hintedMove.type)}
               </text>
             )}
           </g>
@@ -136,11 +147,13 @@ function MoveButton({
   type,
   x,
   y,
+  title,
   onClick,
 }: {
   type: RotationType;
   x: number;
   y: number;
+  title: string;
   onClick: () => void;
 }) {
   return (
@@ -148,7 +161,7 @@ function MoveButton({
       className="move-btn"
       role="button"
       tabIndex={0}
-      aria-label={type === "L" ? "Rotate left" : "Rotate right"}
+      aria-label={title}
       style={{ transform: `translate(${x}px, ${y}px)` }}
       onClick={(e) => {
         e.stopPropagation();
@@ -165,7 +178,7 @@ function MoveButton({
       <circle className="hit" r={22} />
       <circle className="face" r={16} />
       <text textAnchor="middle" dy="0.35em">
-        {type === "L" ? "L" : "R"}
+        {rotationShort(type)}
       </text>
     </g>
   );

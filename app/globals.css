@@ -577,3 +577,183 @@ button.accent {
 .stamp-actions {
   margin-top: 0.5rem;
 }
+
+.node-role {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  pointer-events: none;
+}
+
+.node-role.role-z {
+  fill: var(--cinnabar);
+}
+
+.node-role.role-c {
+  fill: var(--brass);
+}
+
+.node-role.role-g {
+  fill: var(--forest);
+}
+
+.tree-node.role-z .node-disk {
+  stroke: var(--cinnabar);
+  stroke-width: 2.6;
+}
+
+.tree-node.role-c .node-disk {
+  stroke: var(--brass);
+}
+
+.tree-node.role-g .node-disk {
+  stroke: var(--forest);
+}
+
+.coach {
+  margin-top: 1rem;
+  padding: 1rem 1.1rem;
+  border: 2px solid var(--rule);
+  background: rgba(247, 237, 216, 0.85);
+}
+
+.coach-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.coach-head strong {
+  font-family: var(--font-display), serif;
+  font-size: 1.35rem;
+}
+
+.coach-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+}
+
+.coach-title {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+
+.coach-body {
+  margin: 0;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+.coach-body.muted {
+  color: var(--ink-soft);
+}
+
+.coach-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  margin: 0.85rem 0 0;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.68rem;
+  color: var(--ink-soft);
+}
+
+.coach-key span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.role-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 999px;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 0.62rem;
+  color: var(--paper);
+}
+
+.role-badge.c {
+  background: var(--cinnabar);
+}
+
+.role-badge.z {
+  background: var(--brass);
+}
+
+.role-badge.g {
+  background: var(--forest);
+}
+
+.tutorial-nudge {
+  margin: 0.35rem 0 0;
+  padding: 0.55rem 0.75rem;
+  border-left: 3px solid var(--brass);
+  background: rgba(201, 162, 39, 0.12);
+  color: var(--ink-soft);
+  line-height: 1.45;
+}
+
+.tutorial-card {
+  padding: 1.25rem 1.1rem;
+  border: 2px solid var(--ink);
+  background: #f7edd8;
+  box-shadow: 4px 4px 0 var(--ink);
+}
+
+.tutorial-card h2 {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-display), serif;
+  font-size: 2rem;
+}
+
+.tutorial-copy {
+  margin: 0;
+  line-height: 1.65;
+  color: var(--ink);
+}
+
+.tutorial-stage {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  border: 1px solid var(--rule);
+  background: var(--paper);
+}
+
+.tutorial-tip,
+.tutorial-win {
+  margin: 0.85rem 0 0;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.tutorial-win {
+  color: var(--forest);
+}
+
+.tutorial-nav {
+  margin-top: 1.25rem;
+}
+
+.tutorial-practice-actions {
+  margin-top: 0.75rem;
+}

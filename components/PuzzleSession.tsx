@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { CoachPanel } from "@/components/CoachPanel";
 import { TreeView } from "@/components/TreeView";
+import { findPrimaryImbalance, roleMap } from "@/lib/avlGuide";
 import {
   isSolved,
   nextHint,
@@ -45,6 +47,8 @@ type CampaignProps = {
   onComplete: (stars: 0 | 1 | 2 | 3, moves: number, time: number) => void;
   onNextLevel?: () => void;
   hasNextLevel: boolean;
+  /** Show coach + C/Z/G labels by default on tutorial levels. */
+  guideDefault?: boolean;
 };
 
 export type PuzzleSessionProps = FreePlayProps | CampaignProps;
@@ -63,6 +67,9 @@ export function PuzzleSession(props: PuzzleSessionProps) {
   const [win, setWin] = useState<{ moves: number; time: number } | null>(null);
   const [demo, setDemo] = useState(false);
   const [reportedWin, setReportedWin] = useState(false);
+  const [guideOn, setGuideOn] = useState(
+    props.variant === "campaign" ? (props.guideDefault ?? false) : true,
+  );
   const autoRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -80,6 +87,10 @@ export function PuzzleSession(props: PuzzleSessionProps) {
   }, [startedAt, win]);
 
   const solved = useMemo(() => isSolved(game), [game, tick]);
+  const roleLabels = useMemo(() => {
+    if (!guideOn || solved) return undefined;
+    return roleMap(findPrimaryImbalance(game.root));
+  }, [guideOn, solved, game, tick]);
 
   useEffect(() => {
     if (!solved || win || autoPlaying) return;
@@ -133,7 +144,9 @@ export function PuzzleSession(props: PuzzleSessionProps) {
     if (autoPlaying) return;
     const planned = withPlan(game);
     setGame(planned);
-    setHinted(nextHint(planned));
+    const move = nextHint(planned);
+    setHinted(move);
+    if (move) setSelectedId(move.nodeId);
   }
 
   function onAutoSolve() {
@@ -186,6 +199,15 @@ export function PuzzleSession(props: PuzzleSessionProps) {
             ? "Hand-set puzzle with exact optimal par. Match or beat it for three stars."
             : "Random scrambles with procedural par. Restore the AVL invariant at every node."}
         </p>
+        {props.variant === "campaign" &&
+          props.guideDefault &&
+          game.moveCount === 0 &&
+          !win && (
+            <p className="tutorial-nudge">
+              Coach mode is on — look for Z · C · G labels and rotation hints
+              below the tree.
+            </p>
+          )}
       </header>
 
       <section className="hud">
@@ -224,11 +246,19 @@ export function PuzzleSession(props: PuzzleSessionProps) {
           tree={game.root}
           selectedId={selectedId}
           hintedMove={hinted}
+          roleLabels={roleLabels}
           disabled={autoPlaying || !!win}
           onSelect={setSelectedId}
           onRotate={rotate}
         />
       </section>
+
+      <CoachPanel
+        tree={game.root}
+        hinted={hinted}
+        guideOn={guideOn}
+        onToggleGuide={() => setGuideOn((g) => !g)}
+      />
 
       <section className="controls">
         {props.variant === "free" && (
@@ -331,7 +361,11 @@ export function PuzzleSession(props: PuzzleSessionProps) {
             Auto-solve
           </button>
         </div>
-        <p className="footnote">{solveCopy}</p>
+        <p className="footnote">
+          {guideOn
+            ? "Select a node. Left rotation pulls the right child up; right rotation pulls the left child up."
+            : solveCopy}
+        </p>
       </section>
 
       {win && (

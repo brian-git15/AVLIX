@@ -10,13 +10,14 @@ type Props = {
   progress: CampaignProgress;
   onSelect: (levelId: string) => void;
   onBack: () => void;
+  onTutorial: () => void;
 };
 
 function difficultyLabel(difficulty: string): string {
   return difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
 }
 
-export function LevelMap({ progress, onSelect, onBack }: Props) {
+export function LevelMap({ progress, onSelect, onBack, onTutorial }: Props) {
   return (
     <div className="press">
       <header className="masthead">
@@ -64,6 +65,9 @@ export function LevelMap({ progress, onSelect, onBack }: Props) {
       </ol>
 
       <div className="row buttons map-actions">
+        <button type="button" onClick={onTutorial}>
+          Tutorial
+        </button>
         <button type="button" onClick={onBack}>
           Back
         </button>

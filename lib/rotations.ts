@@ -8,6 +8,16 @@ export interface Move {
   nodeId: string;
 }
 
+/** Textbook name for a single rotation (CLRS / AVL convention). */
+export function rotationLabel(type: RotationType): string {
+  return type === "L" ? "Left rotation" : "Right rotation";
+}
+
+/** Short label for buttons. */
+export function rotationShort(type: RotationType): string {
+  return type === "L" ? "Left" : "Right";
+}
+
 export function rotateLeft(node: TreeNode): TreeNode {
   const y = node.right;
   if (!y) {

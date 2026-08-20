@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { LevelMap } from "@/components/LevelMap";
 import { PuzzleSession } from "@/components/PuzzleSession";
+import { Tutorial } from "@/components/Tutorial";
 import {
   loadCampaignProgress,
   recordLevelComplete,
@@ -16,12 +17,14 @@ import {
 } from "@/lib/campaignLevels";
 import { createGameFromLevel, newGame } from "@/lib/gameState";
 
-type Screen = "home" | "free" | "map" | "campaign";
+type Screen = "home" | "tutorial" | "free" | "map" | "campaign";
 
 export function GameApp() {
   const [screen, setScreen] = useState<Screen>("home");
   const [campaignLevelId, setCampaignLevelId] = useState<string | null>(null);
-  const [progress, setProgress] = useState<CampaignProgress | null>(null);
+  const [progress, setProgress] = useState<CampaignProgress | null>(() =>
+    loadCampaignProgress(),
+  );
 
   useEffect(() => {
     setProgress(loadCampaignProgress());
@@ -44,6 +47,18 @@ export function GameApp() {
           </p>
         </header>
         <div className="mode-grid">
+          <button
+            type="button"
+            className="mode-card accent"
+            onClick={() => setScreen("tutorial")}
+          >
+            <span className="mode-kicker">New here?</span>
+            <strong>Tutorial</strong>
+            <small>
+              Learn balance factors, left/right rotations, and Z · C · G roles
+              before the campaign.
+            </small>
+          </button>
           <button
             type="button"
             className="mode-card accent"
@@ -72,11 +87,21 @@ export function GameApp() {
     );
   }
 
+  if (screen === "tutorial") {
+    return (
+      <Tutorial
+        onDone={() => setScreen("home")}
+        onStartCampaign={() => setScreen("map")}
+      />
+    );
+  }
+
   if (screen === "map" && progress) {
     return (
       <LevelMap
         progress={progress}
         onBack={() => setScreen("home")}
+        onTutorial={() => setScreen("tutorial")}
         onSelect={(id) => {
           setCampaignLevelId(id);
           setScreen("campaign");
@@ -105,6 +130,7 @@ export function GameApp() {
     }
     const index = getCampaignLevelIndex(campaignLevelId);
     const nextLevel = CAMPAIGN_LEVELS[index + 1];
+    const isTutorialLevel = level.difficulty === "tutorial";
 
     return (
       <PuzzleSession
@@ -113,6 +139,7 @@ export function GameApp() {
         initialGame={createGameFromLevel(level)}
         levelTitle={level.title ?? `Level ${index + 1}`}
         levelNumber={index + 1}
+        guideDefault={isTutorialLevel}
         onExit={() => setScreen("map")}
         hasNextLevel={index >= 0 && index < CAMPAIGN_LEVELS.length - 1}
         onNextLevel={() => {
