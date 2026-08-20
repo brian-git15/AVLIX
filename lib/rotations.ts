@@ -15,7 +15,7 @@ export function rotationLabel(type: RotationType): string {
 
 /** Short label for buttons. */
 export function rotationShort(type: RotationType): string {
-  return type === "L" ? "Left" : "Right";
+  return type === "L" ? "L" : "R";
 }
 
 export function rotateLeft(node: TreeNode): TreeNode {

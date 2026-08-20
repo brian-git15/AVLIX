@@ -67,6 +67,84 @@ body::before {
   padding: 2.2rem 0 4rem;
 }
 
+.press-play {
+  padding: 1.25rem 0 2.2rem;
+}
+
+.masthead-play {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.45rem 0.9rem;
+  padding-bottom: 0.55rem;
+  margin-bottom: 0.7rem;
+}
+
+.masthead-play .tutorial-nudge {
+  flex-basis: 100%;
+  margin: 0.15rem 0 0;
+}
+
+.press-play .hud {
+  gap: 0.7rem 1.15rem;
+  margin-bottom: 0.55rem;
+}
+
+.press-play .stat strong {
+  font-size: 1.25rem;
+}
+
+.press-play .stage {
+  min-height: 0;
+  padding: 0.75rem;
+  box-shadow:
+    0 0 0 4px var(--paper-deep),
+    0 10px 24px rgba(28, 21, 16, 0.1);
+}
+
+.press-play .tree-svg {
+  min-height: 0;
+  max-height: min(52vh, 420px);
+}
+
+.press-play .move-btn text {
+  font-size: 11px;
+}
+
+.press-play .node-value {
+  font-size: 11px;
+}
+
+.press-play .controls {
+  margin-top: 0.75rem;
+  gap: 0.55rem;
+}
+
+.press-play select,
+.press-play button {
+  min-height: 34px;
+  min-width: 34px;
+  padding: 0 0.7rem;
+  font-size: 0.92rem;
+}
+
+.press-play .footnote {
+  font-size: 0.8rem;
+}
+
+.press-play .coach {
+  margin-top: 0.65rem;
+  padding: 0.65rem 0.8rem;
+}
+
+.press-play .coach-head strong {
+  font-size: 1.05rem;
+}
+
+.press-play .coach-key {
+  margin-top: 0.45rem;
+}
+
 .masthead {
   display: grid;
   grid-template-columns: 1fr;

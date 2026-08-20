@@ -186,19 +186,14 @@ export function PuzzleSession(props: PuzzleSessionProps) {
     : "Auto-solve replays the tighter of greedy local search and DSW — still an upper bound, not necessarily shortest.";
 
   return (
-    <div className="press">
-      <header className="masthead">
+    <div className="press press-play">
+      <header className="masthead masthead-play">
         <p className="kicker">
           {props.variant === "campaign"
             ? `Campaign — ${props.levelTitle}`
             : "Workshop — free scramble"}
         </p>
         <h1>AVLIX</h1>
-        <p className="lede">
-          {props.variant === "campaign"
-            ? "Hand-set puzzle with exact optimal par. Match or beat it for three stars."
-            : "Random scrambles with procedural par. Restore the AVL invariant at every node."}
-        </p>
         {props.variant === "campaign" &&
           props.guideDefault &&
           game.moveCount === 0 &&
@@ -247,6 +242,7 @@ export function PuzzleSession(props: PuzzleSessionProps) {
           selectedId={selectedId}
           hintedMove={hinted}
           roleLabels={roleLabels}
+          compact
           disabled={autoPlaying || !!win}
           onSelect={setSelectedId}
           onRotate={rotate}

@@ -11,6 +11,7 @@ type Props = {
   selectedId: string | null;
   hintedMove: Move | null;
   roleLabels?: Map<string, NodeRole>;
+  compact?: boolean;
   disabled?: boolean;
   onSelect: (id: string | null) => void;
   onRotate: (move: Move) => void;
@@ -27,19 +28,27 @@ export function TreeView({
   selectedId,
   hintedMove,
   roleLabels,
+  compact = false,
   disabled,
   onSelect,
   onRotate,
 }: Props) {
-  const { positions, width, height } = layoutTree(tree);
+  const { positions, width, height } = layoutTree(
+    tree,
+    compact ? 42 : 56,
+    compact ? 54 : 78,
+    compact ? 44 : 72,
+  );
   const factors = balanceFactors(tree);
   const edges = collectEdges(tree);
   const nodes = collectNodes(tree);
+  const nodeR = compact ? 18 : 24;
+  const btnX = compact ? 40 : 52;
 
   return (
     <svg
       className="tree-svg"
-      viewBox={`0 0 ${Math.max(width, 320)} ${Math.max(height, 220)}`}
+      viewBox={`0 0 ${Math.max(width, compact ? 260 : 320)} ${Math.max(height, compact ? 170 : 220)}`}
       role="img"
       aria-label="Binary search tree. Select a node to rotate it left or right."
     >
@@ -81,7 +90,7 @@ export function TreeView({
             style={{ transform: `translate(${pos.x}px, ${pos.y}px)` }}
           >
             <circle
-              r={24}
+              r={nodeR}
               className="node-disk"
               role="button"
               tabIndex={disabled ? -1 : 0}
@@ -101,11 +110,11 @@ export function TreeView({
             <text className="node-value" textAnchor="middle" dy="0.38em">
               {node.value}
             </text>
-            <text className="node-bf" textAnchor="middle" y={-34}>
+            <text className="node-bf" textAnchor="middle" y={compact ? -26 : -34}>
               {bf > 0 ? `+${bf}` : bf}
             </text>
             {role && (
-              <text className={`node-role role-${role.toLowerCase()}`} textAnchor="middle" y={-52}>
+              <text className={`node-role role-${role.toLowerCase()}`} textAnchor="middle" y={compact ? -40 : -52}>
                 {role}
               </text>
             )}
@@ -114,8 +123,9 @@ export function TreeView({
                 {moves.includes("R") && (
                   <MoveButton
                     type="R"
-                    x={-52}
+                    x={-btnX}
                     y={0}
+                    compact={compact}
                     title={moveRotationHint("R")}
                     onClick={() => onRotate({ type: "R", nodeId: node.id })}
                   />
@@ -123,8 +133,9 @@ export function TreeView({
                 {moves.includes("L") && (
                   <MoveButton
                     type="L"
-                    x={52}
+                    x={btnX}
                     y={0}
+                    compact={compact}
                     title={moveRotationHint("L")}
                     onClick={() => onRotate({ type: "L", nodeId: node.id })}
                   />
@@ -132,7 +143,7 @@ export function TreeView({
               </g>
             )}
             {hinted && hintedMove && (
-              <text className="hint-label" textAnchor="middle" y={44}>
+              <text className="hint-label" textAnchor="middle" y={compact ? 32 : 44}>
                 {rotationShort(hintedMove.type)}
               </text>
             )}
@@ -147,12 +158,14 @@ function MoveButton({
   type,
   x,
   y,
+  compact,
   title,
   onClick,
 }: {
   type: RotationType;
   x: number;
   y: number;
+  compact?: boolean;
   title: string;
   onClick: () => void;
 }) {
@@ -175,8 +188,8 @@ function MoveButton({
         }
       }}
     >
-      <circle className="hit" r={22} />
-      <circle className="face" r={16} />
+      <circle className="hit" r={compact ? 16 : 22} />
+      <circle className="face" r={compact ? 13 : 16} />
       <text textAnchor="middle" dy="0.35em">
         {rotationShort(type)}
       </text>
