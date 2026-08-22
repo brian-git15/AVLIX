@@ -357,22 +357,24 @@ export function PuzzleSession(props: PuzzleSessionProps) {
           >
             Undo
           </button>
-          <button
-            type="button"
-            onClick={() => {
-              bump(resetGame(game));
-              setSelectedId(null);
-              setStartedAt(null);
-              setElapsed(0);
-              setWin(null);
-              setShowWin(true);
-              setDemo(false);
-              setReportedWin(false);
-            }}
-            disabled={autoPlaying}
-          >
-            Reset
-          </button>
+          {props.variant !== "daily" && (
+            <button
+              type="button"
+              onClick={() => {
+                bump(resetGame(game));
+                setSelectedId(null);
+                setStartedAt(null);
+                setElapsed(0);
+                setWin(null);
+                setShowWin(true);
+                setDemo(false);
+                setReportedWin(false);
+              }}
+              disabled={autoPlaying}
+            >
+              Reset
+            </button>
+          )}
           {props.variant === "free" && (
             <button type="button" onClick={() => scrambleNew()} disabled={autoPlaying}>
               New scramble
