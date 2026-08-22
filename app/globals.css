@@ -634,10 +634,18 @@ button.accent {
     grid-template-columns: 1fr;
   }
 
+  .press {
+    padding-right: 0;
+  }
+
+  /* In-flow header strip — no overlap with title / Menu */
   .maker-plate-fixed {
-    top: 0.5rem;
-    right: 0.5rem;
-    padding: 0.35rem 0.5rem;
+    position: static;
+    width: calc(100% - 2rem);
+    margin: 0.75rem auto 0;
+    box-sizing: border-box;
+    justify-content: flex-start;
+    padding: 0.4rem 0.65rem;
   }
 
   .maker-plate-fixed .maker-portrait {
@@ -646,12 +654,11 @@ button.accent {
   }
 
   .maker-plate-fixed .maker-copy strong {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
   }
 
-  .maker-plate {
-    justify-self: start;
-    margin-top: 0.35rem;
+  .play-menu-row {
+    justify-content: flex-start;
   }
 }
 
