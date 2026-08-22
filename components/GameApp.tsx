@@ -16,24 +16,50 @@ import {
   getCampaignLevelIndex,
 } from "@/lib/campaignLevels";
 import { createGameFromLevel, newGame } from "@/lib/gameState";
+import {
+  levelFromDailyPayload,
+  utcDateKey,
+  type DailyPayload,
+} from "@/lib/dailyPuzzle";
+import {
+  loadDailyProgress,
+  recordDailyComplete,
+  saveDailyProgress,
+  todayDailyStars,
+  type DailyProgress,
+} from "@/lib/dailyProgress";
 
-type Screen = "home" | "tutorial" | "free" | "map" | "campaign";
+type Screen = "home" | "tutorial" | "free" | "map" | "campaign" | "daily";
 
 export function GameApp() {
-  const [screen, setScreen] = useState<Screen>("home");
+  const [screen, setScreen] = useState<Screen>("daily");
   const [campaignLevelId, setCampaignLevelId] = useState<string | null>(null);
   const [progress, setProgress] = useState<CampaignProgress | null>(() =>
     loadCampaignProgress(),
   );
+  const [dailyProgress, setDailyProgress] = useState<DailyProgress | null>(
+    () => loadDailyProgress(),
+  );
+  const [dailyPayload, setDailyPayload] = useState<DailyPayload | null>(null);
+  const [dailyError, setDailyError] = useState<string | null>(null);
 
   useEffect(() => {
     setProgress(loadCampaignProgress());
+    setDailyProgress(loadDailyProgress());
   }, []);
 
   function updateProgress(next: CampaignProgress) {
     setProgress(next);
     saveCampaignProgress(next);
   }
+
+  function updateDaily(next: DailyProgress) {
+    setDailyProgress(next);
+    saveDailyProgress(next);
+  }
+
+  const today = utcDateKey();
+  const dailyStars = dailyProgress ? todayDailyStars(dailyProgress, today) : 0;
 
   if (screen === "home") {
     return (
@@ -78,6 +104,35 @@ export function GameApp() {
         </header>
 
         <div className="mode-grid">
+          <button
+            type="button"
+            className="mode-card accent"
+            onClick={() => {
+              setDailyPayload(null);
+              setDailyError(null);
+              setScreen("daily");
+            }}
+          >
+            <span className="mode-kicker">UTC midnight</span>
+            <strong>Daily</strong>
+            <small>
+              One worldwide puzzle for {today}. Exact optimal par. New sheet at
+              00:00 UTC.
+              {dailyProgress && dailyProgress.streak > 0
+                ? ` Streak ${dailyProgress.streak}.`
+                : ""}
+            </small>
+            {dailyStars > 0 && (
+              <span className="mode-stars" aria-label={`${dailyStars} stars today`}>
+                {[1, 2, 3].map((i) => (
+                  <i
+                    key={i}
+                    className={i <= dailyStars ? "star on" : "star"}
+                  />
+                ))}
+              </span>
+            )}
+          </button>
           <button
             type="button"
             className="mode-card accent"
@@ -153,6 +208,30 @@ export function GameApp() {
     );
   }
 
+  if (screen === "daily") {
+    return (
+      <DailyGate
+        payload={dailyPayload}
+        error={dailyError}
+        onReady={setDailyPayload}
+        onError={setDailyError}
+        onExit={() => setScreen("home")}
+        onComplete={(stars, moves, time) => {
+          if (!dailyPayload) return;
+          updateDaily(
+            recordDailyComplete(
+              dailyProgress ?? loadDailyProgress(),
+              dailyPayload.date,
+              stars,
+              moves,
+              time,
+            ),
+          );
+        }}
+      />
+    );
+  }
+
   if (screen === "campaign" && campaignLevelId && progress) {
     const level = getCampaignLevel(campaignLevelId);
     if (!level) {
@@ -191,5 +270,88 @@ export function GameApp() {
         <p className="lede">Setting the type…</p>
       </header>
     </div>
+  );
+}
+
+function DailyGate({
+  payload,
+  error,
+  onReady,
+  onError,
+  onExit,
+  onComplete,
+}: {
+  payload: DailyPayload | null;
+  error: string | null;
+  onReady: (payload: DailyPayload) => void;
+  onError: (message: string) => void;
+  onExit: () => void;
+  onComplete: (stars: 0 | 1 | 2 | 3, moves: number, time: number) => void;
+}) {
+  useEffect(() => {
+    if (payload || error) return;
+    let cancelled = false;
+    fetch("/api/daily")
+      .then(async (res) => {
+        if (!res.ok) {
+          const body = (await res.json().catch(() => null)) as
+            | { error?: string }
+            | null;
+          throw new Error(body?.error ?? `Daily failed (${res.status})`);
+        }
+        return res.json() as Promise<DailyPayload>;
+      })
+      .then((data) => {
+        if (!cancelled) onReady(data);
+      })
+      .catch((err: unknown) => {
+        if (!cancelled) {
+          onError(err instanceof Error ? err.message : "Daily failed");
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [payload, error, onReady, onError]);
+
+  if (error) {
+    return (
+      <div className="press">
+        <header className="masthead">
+          <p className="kicker">Daily</p>
+          <h1>AVLIX</h1>
+          <p className="lede">{error}</p>
+        </header>
+        <div className="row buttons">
+          <button type="button" onClick={onExit}>
+            Menu
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!payload) {
+    return (
+      <div className="press">
+        <header className="masthead">
+          <p className="kicker">Daily</p>
+          <h1>AVLIX</h1>
+          <p className="lede">Setting today’s type…</p>
+        </header>
+      </div>
+    );
+  }
+
+  const level = levelFromDailyPayload(payload);
+  return (
+    <PuzzleSession
+      key={payload.date}
+      variant="daily"
+      date={payload.date}
+      initialGame={createGameFromLevel(level)}
+      onExit={onExit}
+      onComplete={onComplete}
+    />
   );
 }

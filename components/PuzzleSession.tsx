@@ -49,7 +49,15 @@ type CampaignProps = {
   hasNextLevel: boolean;
 };
 
-export type PuzzleSessionProps = FreePlayProps | CampaignProps;
+type DailyProps = {
+  variant: "daily";
+  initialGame: GameState;
+  date: string;
+  onExit: () => void;
+  onComplete: (stars: 0 | 1 | 2 | 3, moves: number, time: number) => void;
+};
+
+export type PuzzleSessionProps = FreePlayProps | CampaignProps | DailyProps;
 
 export function PuzzleSession(props: PuzzleSessionProps) {
   const [game, setGame] = useState(props.initialGame);
@@ -102,7 +110,13 @@ export function PuzzleSession(props: PuzzleSessionProps) {
   }, [solved, autoPlaying, game]);
 
   useEffect(() => {
-    if (props.variant !== "campaign" || !win || reportedWin) return;
+    if (
+      (props.variant !== "campaign" && props.variant !== "daily") ||
+      !win ||
+      reportedWin
+    ) {
+      return;
+    }
     const stars = computeStars(win.moves, game.level, game.level);
     props.onComplete(stars, win.moves, win.time);
     setReportedWin(true);
@@ -190,9 +204,12 @@ export function PuzzleSession(props: PuzzleSessionProps) {
     ? computeStars(win.moves, game.level, game.level)
     : 0;
 
-  const solveCopy = game.level.parExact
-    ? "Auto-solve replays the optimal rotation sequence for this puzzle."
-    : "Auto-solve replays the tighter of greedy local search and DSW — still an upper bound, not necessarily shortest.";
+  const solveCopy =
+    props.variant === "free"
+      ? game.level.parExact
+        ? "Auto-solve replays the optimal rotation sequence for this puzzle."
+        : "Auto-solve replays the tighter of greedy local search and DSW — still an upper bound, not necessarily shortest."
+      : "Select a node, then tap L or R. Hint shows one next rotation.";
 
   return (
     <div className="press press-play">
@@ -200,10 +217,20 @@ export function PuzzleSession(props: PuzzleSessionProps) {
         <p className="kicker">
           {props.variant === "campaign"
             ? `Campaign — ${props.levelTitle}`
-            : "Workshop — free scramble"}
+            : props.variant === "daily"
+              ? `Daily — ${props.date}`
+              : "Workshop — free scramble"}
         </p>
         <h1>AVLIX</h1>
       </header>
+
+      {props.variant === "daily" && (
+        <div className="row buttons play-menu-row">
+          <button type="button" className="accent" onClick={props.onExit}>
+            Menu
+          </button>
+        </div>
+      )}
 
       <section className="hud">
         <div className="stat">
@@ -222,6 +249,11 @@ export function PuzzleSession(props: PuzzleSessionProps) {
           <div className="stat">
             <span>Level</span>
             <strong>{props.levelNumber}</strong>
+          </div>
+        ) : props.variant === "daily" ? (
+          <div className="stat">
+            <span>Nodes</span>
+            <strong>{game.n}</strong>
           </div>
         ) : (
           <div className="stat">
@@ -349,14 +381,16 @@ export function PuzzleSession(props: PuzzleSessionProps) {
           <button type="button" onClick={onHint} disabled={autoPlaying || solved}>
             Hint
           </button>
-          <button
-            type="button"
-            className="accent"
-            onClick={onAutoSolve}
-            disabled={autoPlaying || solved}
-          >
-            Auto-solve
-          </button>
+          {props.variant === "free" && (
+            <button
+              type="button"
+              className="accent"
+              onClick={onAutoSolve}
+              disabled={autoPlaying || solved}
+            >
+              Auto-solve
+            </button>
+          )}
           {win && !showWin && (
             <button type="button" onClick={() => setShowWin(true)}>
               Results
@@ -424,7 +458,7 @@ export function PuzzleSession(props: PuzzleSessionProps) {
                 </button>
               ) : (
                 <button type="button" onClick={props.onExit}>
-                  Back to map
+                  {props.variant === "daily" ? "Back to menu" : "Back to map"}
                 </button>
               )}
             </div>

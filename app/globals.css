@@ -85,6 +85,11 @@ body::before {
   margin: 0.15rem 0 0;
 }
 
+.play-menu-row {
+  margin: 0 0 0.75rem;
+  justify-content: flex-end;
+}
+
 .press-play .hud {
   gap: 0.7rem 1.15rem;
   margin-bottom: 0.55rem;
@@ -654,6 +659,12 @@ button.accent {
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--brass);
+}
+
+.mode-stars {
+  display: flex;
+  gap: 0.25rem;
+  margin-top: 0.15rem;
 }
 
 .level-map {
