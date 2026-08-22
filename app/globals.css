@@ -65,6 +65,7 @@ body::before {
   width: min(1120px, calc(100% - 2rem));
   margin: 0 auto;
   padding: 2.2rem 0 4rem;
+  padding-right: max(0px, min(11rem, 22vw));
 }
 
 .press-play {
@@ -570,6 +571,21 @@ button.accent {
   background: rgba(247, 237, 216, 0.7);
 }
 
+.app-shell {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  min-height: 100%;
+}
+
+.maker-plate-fixed {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.85rem;
+  z-index: 25;
+  box-shadow: 2px 2px 0 rgba(28, 21, 16, 0.12);
+}
+
 .maker-portrait {
   width: 52px;
   height: 52px;
@@ -616,6 +632,21 @@ button.accent {
 
   .masthead-home {
     grid-template-columns: 1fr;
+  }
+
+  .maker-plate-fixed {
+    top: 0.5rem;
+    right: 0.5rem;
+    padding: 0.35rem 0.5rem;
+  }
+
+  .maker-plate-fixed .maker-portrait {
+    width: 40px;
+    height: 40px;
+  }
+
+  .maker-plate-fixed .maker-copy strong {
+    font-size: 0.9rem;
   }
 
   .maker-plate {

@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { LevelMap } from "@/components/LevelMap";
+import { MakerPlate } from "@/components/MakerPlate";
 import { PuzzleSession } from "@/components/PuzzleSession";
 import { Tutorial } from "@/components/Tutorial";
 import {
@@ -61,46 +62,18 @@ export function GameApp() {
   const today = utcDateKey();
   const dailyStars = dailyProgress ? todayDailyStars(dailyProgress, today) : 0;
 
+  let content: ReactNode;
+
   if (screen === "home") {
-    return (
+    content = (
       <div className="press">
-        <header className="masthead masthead-home">
-          <div className="masthead-copy">
-            <p className="kicker">Workshop No. 1 — tree shapes only</p>
-            <h1>AVLIX</h1>
-            <p className="lede">
-              A Rubik’s cube for binary trees. In-order stays sorted; only shape
-              changes. Pick a mode to begin.
-            </p>
-          </div>
-          <aside className="maker-plate" aria-label="About the maker">
-            <img
-              className="maker-portrait"
-              src="/brian-su.png"
-              alt="Brian Su"
-              width={52}
-              height={52}
-            />
-            <div className="maker-copy">
-              <strong>Brian Su</strong>
-              <p className="maker-links">
-                <a
-                  href="https://brian-su-website.vercel.app/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Website
-                </a>
-                <a
-                  href="https://www.linkedin.com/in/briansu33/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  LinkedIn
-                </a>
-              </p>
-            </div>
-          </aside>
+        <header className="masthead">
+          <p className="kicker">Workshop No. 1 — tree shapes only</p>
+          <h1>AVLIX</h1>
+          <p className="lede">
+            A Rubik’s cube for binary trees. In-order stays sorted; only shape
+            changes. Pick a mode to begin.
+          </p>
         </header>
 
         <div className="mode-grid">
@@ -171,19 +144,15 @@ export function GameApp() {
         </div>
       </div>
     );
-  }
-
-  if (screen === "tutorial") {
-    return (
+  } else if (screen === "tutorial") {
+    content = (
       <Tutorial
         onDone={() => setScreen("home")}
         onStartCampaign={() => setScreen("map")}
       />
     );
-  }
-
-  if (screen === "map" && progress) {
-    return (
+  } else if (screen === "map" && progress) {
+    content = (
       <LevelMap
         progress={progress}
         onBack={() => setScreen("home")}
@@ -194,10 +163,8 @@ export function GameApp() {
         }}
       />
     );
-  }
-
-  if (screen === "free") {
-    return (
+  } else if (screen === "free") {
+    content = (
       <PuzzleSession
         key="free"
         variant="free"
@@ -206,10 +173,8 @@ export function GameApp() {
         onNewScramble={(size, mode, depth) => newGame(size, mode, depth)}
       />
     );
-  }
-
-  if (screen === "daily") {
-    return (
+  } else if (screen === "daily") {
+    content = (
       <DailyGate
         payload={dailyPayload}
         error={dailyError}
@@ -230,45 +195,53 @@ export function GameApp() {
         }}
       />
     );
-  }
-
-  if (screen === "campaign" && campaignLevelId && progress) {
+  } else if (screen === "campaign" && campaignLevelId && progress) {
     const level = getCampaignLevel(campaignLevelId);
     if (!level) {
       setScreen("map");
-      return null;
-    }
-    const index = getCampaignLevelIndex(campaignLevelId);
-    const nextLevel = CAMPAIGN_LEVELS[index + 1];
+      content = null;
+    } else {
+      const index = getCampaignLevelIndex(campaignLevelId);
+      const nextLevel = CAMPAIGN_LEVELS[index + 1];
 
-    return (
-      <PuzzleSession
-        key={campaignLevelId}
-        variant="campaign"
-        initialGame={createGameFromLevel(level)}
-        levelTitle={level.title ?? `Level ${index + 1}`}
-        levelNumber={index + 1}
-        onExit={() => setScreen("map")}
-        hasNextLevel={index >= 0 && index < CAMPAIGN_LEVELS.length - 1}
-        onNextLevel={() => {
-          if (nextLevel) {
-            setCampaignLevelId(nextLevel.id);
-          }
-        }}
-        onComplete={(stars) => {
-          updateProgress(recordLevelComplete(progress, campaignLevelId, stars));
-        }}
-      />
+      content = (
+        <PuzzleSession
+          key={campaignLevelId}
+          variant="campaign"
+          initialGame={createGameFromLevel(level)}
+          levelTitle={level.title ?? `Level ${index + 1}`}
+          levelNumber={index + 1}
+          onExit={() => setScreen("map")}
+          hasNextLevel={index >= 0 && index < CAMPAIGN_LEVELS.length - 1}
+          onNextLevel={() => {
+            if (nextLevel) {
+              setCampaignLevelId(nextLevel.id);
+            }
+          }}
+          onComplete={(stars) => {
+            updateProgress(
+              recordLevelComplete(progress, campaignLevelId, stars),
+            );
+          }}
+        />
+      );
+    }
+  } else {
+    content = (
+      <div className="press">
+        <header className="masthead">
+          <p className="kicker">Workshop No. 1</p>
+          <h1>AVLIX</h1>
+          <p className="lede">Setting the type…</p>
+        </header>
+      </div>
     );
   }
 
   return (
-    <div className="press">
-      <header className="masthead">
-        <p className="kicker">Workshop No. 1</p>
-        <h1>AVLIX</h1>
-        <p className="lede">Setting the type…</p>
-      </header>
+    <div className="app-shell">
+      <MakerPlate />
+      {content}
     </div>
   );
 }
