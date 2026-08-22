@@ -221,7 +221,12 @@ export function PuzzleSession(props: PuzzleSessionProps) {
               ? `Daily — ${props.date}`
               : "Workshop — free scramble"}
         </p>
-        <h1>AVLIX</h1>
+        <h1>
+          AVLIX
+          {props.variant === "daily" && (
+            <span className="title-sub">daily puzzle</span>
+          )}
+        </h1>
       </header>
 
       {props.variant === "daily" && (

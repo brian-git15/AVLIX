@@ -80,6 +80,24 @@ body::before {
   margin-bottom: 0.7rem;
 }
 
+.masthead-play h1 {
+  font-size: 1.45rem;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+}
+
+.masthead-play .title-sub {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+
 .masthead-play .tutorial-nudge {
   flex-basis: 100%;
   margin: 0.15rem 0 0;
