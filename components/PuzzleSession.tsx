@@ -75,6 +75,7 @@ export function PuzzleSession(props: PuzzleSessionProps) {
   const [demo, setDemo] = useState(false);
   const [reportedWin, setReportedWin] = useState(false);
   const [guideOn, setGuideOn] = useState(false);
+  const [dailyHintUsed, setDailyHintUsed] = useState(false);
   const autoRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -155,11 +156,13 @@ export function PuzzleSession(props: PuzzleSessionProps) {
 
   function onHint() {
     if (autoPlaying) return;
+    if (props.variant === "daily" && dailyHintUsed) return;
     const planned = withPlan(game);
     setGame(planned);
     const move = nextHint(planned);
     setHinted(move);
     if (move) setSelectedId(move.nodeId);
+    if (props.variant === "daily") setDailyHintUsed(true);
   }
 
   function onAutoSolve() {
@@ -209,7 +212,9 @@ export function PuzzleSession(props: PuzzleSessionProps) {
       ? game.level.parExact
         ? "Auto-solve replays the optimal rotation sequence for this puzzle."
         : "Auto-solve replays the tighter of greedy local search and DSW — still an upper bound, not necessarily shortest."
-      : "Select a node, then tap L or R. Hint shows one next rotation.";
+      : props.variant === "daily"
+        ? "Select a node, then tap L or R. One hint per day."
+        : "Select a node, then tap L or R. Hint shows one next rotation.";
 
   return (
     <div className="press press-play">
@@ -385,8 +390,16 @@ export function PuzzleSession(props: PuzzleSessionProps) {
               New scramble
             </button>
           )}
-          <button type="button" onClick={onHint} disabled={autoPlaying || solved}>
-            Hint
+          <button
+            type="button"
+            onClick={onHint}
+            disabled={
+              autoPlaying ||
+              solved ||
+              (props.variant === "daily" && dailyHintUsed)
+            }
+          >
+            {props.variant === "daily" && dailyHintUsed ? "Hint used" : "Hint"}
           </button>
           {props.variant === "free" && (
             <button
